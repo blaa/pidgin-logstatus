@@ -1,0 +1,95 @@
+#
+# pidgin-logstatus Makefile
+#
+# Copyright 2004 Edouard Geuten <thegrima AT altern DOT org>
+#
+# Heavily inspired and copied from :
+# Gaim Extended Preferences Plugin Main Makefile
+# Copyright 2004 Kevin Stange <extprefs@simguy.net>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+CC := gcc
+LIBTOOL := libtool
+
+# the following is taken from Gaim-1.5.0 Makefile.mingw in src-dir
+#
+# PATHS
+#
+
+INCLUDE_DIR :=		.
+GTK_TOP :=		../win32-dev/gtk_2_0
+PIDGIN_TOP :=		../pidgin-2.0.0
+PIDGIN_SRC :=		$(PIDGIN_TOP)/src
+#ASPELL_TOP :=		../win32-dev/aspell-dev-0-50-3-3
+#GTKSPELL_TOP :=		../../win32-dev/gtkspell-2.0.6
+IDLETRACK_TOP :=	$(PIDGIN_TOP)/src/win32/IdleTracker
+MINGW_PLUS_DIR :=	$(PIDGIN_SRC)/win32/mingw_plus
+#NSS_DIR :=		../win32-dev/nss-3.9
+#NSPR_DIR :=		../win32-dev/nspr-4.4.1
+
+##
+## VARIABLE DEFINITIONS
+##
+# Compiler and Linker Options
+
+CFLAGS =
+
+DEFINES =
+
+LDFLAGS =
+
+WINDRES := windres
+
+##
+## INCLUDE PATHS
+##
+
+INCLUDE_PATHS = -I$(MINGW_PLUS_DIR) \
+      -I$(IDLETRACK_TOP) \
+      -I$(PIDGIN_TOP) \
+      -I$(PIDGIN_SRC) \
+      -I$(PIDGIN_SRC)/win32 \
+      -I$(GTK_TOP)/include \
+      -I$(GTK_TOP)/include/gtk-2.0 \
+      -I$(GTK_TOP)/include/glib-2.0 \
+      -I$(GTK_TOP)/include/pango-1.0 \
+      -I$(GTK_TOP)/include/atk-1.0 \
+      -I$(GTK_TOP)/lib/glib-2.0/include \
+      -I$(GTK_TOP)/lib/gtk-2.0/include
+
+LIB_PATHS =		-L$(GTK_TOP)/lib \
+			-L$(PIDGIN_SRC)
+
+PIDGIN_LOGSTATUS = logstatus
+
+PIDGIN_CFLAGS  = -I$(PIDGIN_SRC)
+GTK_CFLAGS   =
+PIDGIN_LIBS    = -lpurple
+GTK_LIBS     = -lgtk-win32-2.0
+PIDGIN_LOGSTATUS_LIBS = -lintl -lglib-2.0
+PIDGIN_LOGSTATUS_CFLAGS=-DPURPLE_PLUGINS
+
+all: $(PIDGIN_LOGSTATUS).dll
+
+$(PIDGIN_LOGSTATUS).dll: $(PIDGIN_LOGSTATUS).o
+	$(CC) -shared $(CFLAGS) $< -o $@ $(PIDGIN_LIBS) $(GTK_LIBS) $(PIDGIN_LOGSTATUS_LIBS) $(LIB_PATHS) -Wl,--export-dynamic -Wl,-soname
+
+$(PIDGIN_LOGSTATUS).o:$(PIDGIN_LOGSTATUS).c
+	$(CC) $(CFLAGS) $(INCLUDE_PATHS) -c $< -o $@ $(PIDGIN_LOGSTATUS_CFLAGS) $(PIDGIN_CFLAGS) $(GTK_CFLAGS)
+
+clean:
+	rm -rf *.o *.c~ *.dll *.la .libs

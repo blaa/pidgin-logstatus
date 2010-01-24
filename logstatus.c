@@ -124,13 +124,13 @@ buddy_idle_changed_cb(PurpleBuddy *buddy, gboolean old_idle, gboolean idle,
 static void
 buddy_signon_cb(PurpleBuddy *buddy, void *data)
 {
-	write_status(buddy, _("%s has signon: %s (%s)"));
+	write_status(buddy, _("%s has signed on: %s (%s)"));
 }
 
 static void
 buddy_signoff_cb(PurpleBuddy *buddy, void *data)
 {
-	write_status(buddy, _("%s has signoff: %s (%s)"));
+	write_status(buddy, _("%s has signed off: %s (%s)"));
 }
 
 static gboolean
@@ -175,7 +175,7 @@ static PurplePluginInfo info =
 
 	LOGSTATUS_PLUGIN_ID,
 	N_("Buddy Status history"),
-	N_("0.5v"),
+	N_("0.6v"),
 
 	N_("Stores in the buddy history his status changes"),
 	N_("Stores in the buddy history his status changes"),

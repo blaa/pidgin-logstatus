@@ -1,0 +1,3 @@
+v0.6
+* changed "signon" -> "signed on" etc. in messages
+* Added Makefile.mingw - not tested by me!
