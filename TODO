@@ -1,0 +1,2 @@
+Rewrite logger so it won't place each status in separate file.
+

@@ -1,0 +1,31 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Buddy status history plugin.
+
+See a "TODO" file for the most irritating bugs, 
+best before using this plugin at all.
+There's NO WARRANTY see COPYING file.
+
+*** Installation:
+$ make
+
+And place .so in ~/.purple/plugins:
+$ make install
+(or somewhere in the system for global use)
+Then enable in plugin list.
+
+
+*** Contact/Copyleft
+Plugin author: Tomasz bla Fortuna <bla@thera.be>
+
+Visit Makefile for it's own copyright. ;)
+
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.9 (GNU/Linux)
+
+iEYEARECAAYFAkhn5FwACgkQT6wvGJB0bnlrJACglxk1G2Zo9gZNQ4s23IhNMhYP
+TDQAmgPxiDNVKbyCLQixbSdmRPTxdYiL
+=NfFg
+-----END PGP SIGNATURE-----
