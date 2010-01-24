@@ -1,8 +1,3 @@
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
-
-
-
 *** Buddy status history plugin.
 
 See a "TODO" file for the most irritating bugs, best before using this
@@ -11,25 +6,30 @@ plugin at all. There's NO WARRANTY see COPYING file.
 *** Installation:
 This is a source distribution and requires a working compiler toolchain.
 
+You can edit logstatus.c and change two flags. 
+DEBUG and ONLY_OPENED_CONVERSATIONS. 
+
 Compilation:
 $ make
 
-And place .so in ~/.purple/plugins:
-$ make install
-(or somewhere in the system for global use)
-Then enable in plugin list.
+On Windows you can try:
+> make -f Makefile.mingw
 
-On Windows: make -f Makefile.mingw 
+Then place compiled .so (dll) file inside ~/.purple/plugins:
+$ cp logstatus.so ~/.purple/plugins/
+
+Or instead try installing system-wide:
+$ make install
+
+
+Then enable plugin in Pidgin. It's visible under the name:
+"Buddy Status History".
+
+
 
 *** Contact/Copyleft
 Plugin author: Tomasz bla Fortuna <bla@thera.be>
+License: GNU GPL2
 
 Visit Makefile for it's own copyright. ;)
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.9 (GNU/Linux)
-
-iEYEARECAAYFAkhvAfEACgkQT6wvGJB0bnkoSgCfaSdVTdZ7yo/Cru8u888TvmYi
-tWMAn3uqTYkFemobliQoA9ZOg/q10R4y
-=jCqQ
------END PGP SIGNATURE-----

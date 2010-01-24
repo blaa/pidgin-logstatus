@@ -1,3 +1,7 @@
+v0.7
+Fixed problem of multiple log files opened 
+when no conversation available.
+
 v0.6
 * changed "signon" -> "signed on" etc. in messages
 * Added Makefile.mingw - not tested by me!

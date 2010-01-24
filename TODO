@@ -1,2 +1,7 @@
+Possible bugs in 0.7 include:
+- I'm not sure if date will be correctly logged into appended logs
+  when day changes
+
+Fixed in 0.7:
 Rewrite logger so it won't place each status in separate file.
 

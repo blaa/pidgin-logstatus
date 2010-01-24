@@ -29,6 +29,76 @@
 
 #define LOGSTATUS_PLUGIN_ID "core-logstatus"
 
+/* Debug */
+#define DEBUG 1
+
+/* Set to 1 if you don't want to trace users without conversation */
+#define ONLY_OPENED_CONVERSATIONS 0
+
+#define INTRO "logstatus: "
+
+
+static int try_to_append(PurpleBuddy *buddy, const char *message)
+{
+	/* Log file to write to */
+	PurpleLog *log = NULL;
+
+	GList *list;
+	list = purple_log_get_logs(PURPLE_LOG_IM, buddy->name, buddy->account);
+	if (!list)
+		return 0;
+
+	log = g_list_first(list)->data;
+	g_list_free(list);
+	
+	if (!log) {
+		if (DEBUG)
+			printf(INTRO "Unable to append, log list empty\n");
+		return 0;
+	}
+	
+	if (!log->logger) {
+		if (DEBUG)
+			printf(INTRO "Unable to append logger is NULL\n");
+		return 0;
+	}
+
+	if (!log->logger_data) {
+		if (DEBUG)
+			printf(INTRO "Unable to append NULL logger_data\n");
+		return 0;
+	}
+
+	/* We must reopen log file 
+	 * This should work with txt logger and html logger.
+	 * No idea about others. This is kind of hack.
+	 *
+	 * We don't know real type of logger_data.
+	 */
+	PurpleLogCommonLoggerData *data = log->logger_data;
+
+	if (data->file) {
+		/* Right. This should be NULL really, type might be wrong. */
+		if (DEBUG) 
+			printf(INTRO "WARNING incompatible logger or logging system updated!\n");
+		return 0;
+	} 
+
+	data->file = fopen(data->path, "a");
+	if (!data->file) {
+		if (DEBUG) 
+			printf(INTRO "Unable to append to existing log!\n");
+		return 0;
+	}
+
+	const char *alias = purple_buddy_get_alias(buddy);
+	purple_log_write(log, PURPLE_MESSAGE_SYSTEM, alias, time(NULL), message);
+
+	fclose(data->file);
+	data->file = NULL;
+	return 1;
+}
+
 static void
 write_message(PurpleBuddy *buddy, const char *message)
 {
@@ -41,22 +111,29 @@ write_message(PurpleBuddy *buddy, const char *message)
 	
 	if (conv != NULL) {
 		/* If conversation is open just place there the message using purple_conversation_write() */
-/*		printf("Conv logging! Conv name = %s\n", conv->name); */
 		purple_conversation_write(conv, alias, message, PURPLE_MESSAGE_SYSTEM, time(NULL));
 	} else {
-		/* When it's not - open an log */
-		/* TODO: Make it append data to the most recent log */
-		PurpleLog *log;
-
-		log = purple_log_new(PURPLE_LOG_IM, buddy->name, buddy->account, NULL, time(NULL), NULL);
-/*		printf("Plain log logging! buddy->name = %s mesg = %s\n", buddy->name, message); */
-
-		if (!log) {
-			printf("logstatus plugin: Log creation failed!\n");
+		/* No conversation opened. Reopen last or create new */
+		if (ONLY_OPENED_CONVERSATIONS)
 			return;
+
+		/* Log file to write to */
+		PurpleLog *log = NULL;
+
+		if (!try_to_append(buddy, message)) {
+			if (DEBUG)
+				printf(INTRO "Creating new log file for %s\n", buddy->name);
+
+			log = purple_log_new(PURPLE_LOG_IM, buddy->name, buddy->account, NULL, time(NULL), NULL);
+			if (!log) {
+				printf(INTRO "Log creation for %s failed!\n", buddy->name);
+				return;
+			}
+
+			purple_log_write(log, PURPLE_MESSAGE_SYSTEM, alias, time(NULL), message);
+			purple_log_free(log);
 		}
-		purple_log_write(log, PURPLE_MESSAGE_SYSTEM, alias, time(NULL), message);
-		purple_log_free(log);
+
 	}
 	return;
 }
@@ -137,7 +214,6 @@ static gboolean
 plugin_load(PurplePlugin *plugin)
 {
 	void *blist_handle = purple_blist_get_handle();
-
 	purple_signal_connect(blist_handle, "buddy-status-changed", plugin,
 		PURPLE_CALLBACK(buddy_status_changed_cb), NULL);
 	purple_signal_connect(blist_handle, "buddy-idle-changed", plugin,
@@ -175,7 +251,7 @@ static PurplePluginInfo info =
 
 	LOGSTATUS_PLUGIN_ID,
 	N_("Buddy Status history"),
-	N_("0.6v"),
+	N_("0.7v"),
 
 	N_("Stores in the buddy history his status changes"),
 	N_("Stores in the buddy history his status changes"),
@@ -201,7 +277,8 @@ static PurplePluginInfo info =
 static void
 init_plugin(PurplePlugin *plugin)
 {
-	printf("Init plugin!!!\n");
+	if (DEBUG)
+		printf(INTRO "entry\n");
 }
 
 PURPLE_INIT_PLUGIN(logstatus, init_plugin, info)
