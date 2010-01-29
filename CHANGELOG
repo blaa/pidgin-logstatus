@@ -1,3 +1,6 @@
+v0.8
+Memory leak fixed
+
 v0.7
 Fixed problem of multiple log files opened 
 when no conversation available.

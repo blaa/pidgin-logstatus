@@ -40,6 +40,8 @@
 
 static int try_to_append(PurpleBuddy *buddy, const char *message)
 {
+	int retval = 0;
+
 	/* Log file to write to */
 	PurpleLog *log = NULL;
 
@@ -49,24 +51,23 @@ static int try_to_append(PurpleBuddy *buddy, const char *message)
 		return 0;
 
 	log = g_list_first(list)->data;
-	g_list_free(list);
 	
 	if (!log) {
 		if (DEBUG)
 			printf(INTRO "Unable to append, log list empty\n");
-		return 0;
+		goto cleanup;	
 	}
 	
 	if (!log->logger) {
 		if (DEBUG)
 			printf(INTRO "Unable to append logger is NULL\n");
-		return 0;
+		goto cleanup;	
 	}
 
 	if (!log->logger_data) {
 		if (DEBUG)
 			printf(INTRO "Unable to append NULL logger_data\n");
-		return 0;
+		goto cleanup;	
 	}
 
 	/* We must reopen log file 
@@ -81,14 +82,14 @@ static int try_to_append(PurpleBuddy *buddy, const char *message)
 		/* Right. This should be NULL really, type might be wrong. */
 		if (DEBUG) 
 			printf(INTRO "WARNING incompatible logger or logging system updated!\n");
-		return 0;
+		goto cleanup;	
 	} 
 
 	data->file = fopen(data->path, "a");
 	if (!data->file) {
 		if (DEBUG) 
 			printf(INTRO "Unable to append to existing log!\n");
-		return 0;
+		goto cleanup;	
 	}
 
 	const char *alias = purple_buddy_get_alias(buddy);
@@ -96,7 +97,13 @@ static int try_to_append(PurpleBuddy *buddy, const char *message)
 
 	fclose(data->file);
 	data->file = NULL;
-	return 1;
+
+	/* All fine */
+	retval = 1;
+cleanup:
+        g_list_foreach(list, (GFunc)purple_log_free, NULL);
+	g_list_free(list);
+	return retval;
 }
 
 static void
